@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "text-generation"
+dynamic = ["version"]
+description = ''
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "aarr", email = "arar0529@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = []
+
+[project.urls]
+Documentation = "https://github.com/aarr/text-generation#readme"
+Issues = "https://github.com/aarr/text-generation/issues"
+Source = "https://github.com/aarr/text-generation"
+
+[tool.hatch.version]
+path = "src/text_generation/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/text_generation tests}"
+
+[tool.coverage.run]
+source_pkgs = ["text_generation", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/text_generation/__about__.py",
+]
+
+[tool.coverage.paths]
+text_generation = ["src/text_generation", "*/text-generation/src/text_generation"]
+tests = ["tests", "*/text-generation/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
