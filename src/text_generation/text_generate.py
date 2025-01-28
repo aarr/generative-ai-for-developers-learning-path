@@ -7,6 +7,7 @@ from typing import Callable
 
 import MyModel as mdl
 import OneStep as osmdl
+import CustomTraining as csmdl
 
 # 文字列からbyteコードへ変換する関数を生成
 def generate_ids_from_chars(vocab:str) -> Callable[[str], object]:
@@ -111,6 +112,7 @@ def main():
     
 
     # Build The Model
+    print("\n", "-" * 10, "Build Model", "-" * 10)
     BATCH_SIZE = 64
     BUFFER_SIZE = 10000
     # dataset再定義
@@ -175,6 +177,8 @@ def main():
     start = time.time()
     states = None
     next_char = tf.constant(["ROMEO:"])
+    # バッチ化
+    #next_char = tf.constant(["ROMEO:", "ROMEO:", "ROMEO:", "ROMEO:", "ROMEO:"])
     result = [next_char]
 
     for n in range(1000):
@@ -186,9 +190,69 @@ def main():
     
     result = tf.strings.join(result)
     end = time.time()
+
     print(result[0].numpy().decode("utf-8"), "\n\n" + "_" * 80)
+    # バッチ化
+    # for s in result:
+    #     print(s.numpy().decode("utf-8"))
     print("\nRun time:", end - start)
 
+    print("\n", "-" * 10, "Model Saved & Load", "-" * 10)
+    # Model保存＆ロード
+    tf.saved_model.save(one_step_model, "one_step")
+    one_step_reloaded = tf.saved_model.load("one_step")
+
+    states = None
+    next_char = ["ROMEO:"]
+    result = [next_char]
+
+    for n in range(100):
+        next_char, states = one_step_reloaded.generate_one_step(
+            next_char,
+            states
+        )
+        result.append(next_char)
+
+    print(tf.strings.join(result)[0].numpy().decode("utf-8"))
+
+    # Customized Traingin
+    print("\n", "-" * 10, "Model Customized Training", "-" * 10)
+    model = csmdl.CustomTraining(
+        vocab_size=len(ids_from_chars.get_vocabulary()),
+        embedding_dim=embedding_dim,
+        rnn_unit=rnn_unit
+    )
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(),
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    )
+    model.fit(dataset, epochs=1)
+
+    mean = tf.metrics.Mean()
+    for epoch in range(EPOCH):
+        start = time.time()
+
+        mean.reset_state()
+        for batch_n, (inp, target) in enumerate(dataset):
+            logs = model.train_step([inp, target])
+            loss = logs["loss"]
+            mean.update_state(loss)
+
+            if batch_n % 50 == 0:
+                template = (
+                    f"Epoch {epoch + 1} Batch {batch_n} Loss {loss:.4f}"
+                )
+                print(template)
+
+        if (epoch + 1) % 5 == 0:
+           model.save_weights(checkpoint_prefix.format(epoch=epoch))
+
+        print()
+        print(f"Epoch {epoch + 1} Loss {mean.result().numpy():.4f}")
+        print(f"Time taken for 1 epoch {time.time() - start:.2f} sec")
+        print("-" * 80)
+
+    model.save_weights(checkpoint_prefix.format(epoch=epoch))
 
 # debugする為には実行が必要
 # main()
