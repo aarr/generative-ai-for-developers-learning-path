@@ -143,6 +143,7 @@ def main():
             example_batch_predictions.shape,
             "# (batch_size, sequence_length, vocab_size)"
         )
+    model.summary()
     
     sample_indices = tf.random.categorical(
         example_batch_predictions[0], num_samples=1
