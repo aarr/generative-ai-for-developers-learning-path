@@ -1,10 +1,10 @@
-# [Encoder-Decoder Architecture Learning](https://github.com/GoogleCloudPlatform/asl-ml-immersion/blob/master/notebooks/text_models/solutions/text_generation.ipynb)
+# [Generative AI for Developers Learning Path](https://www.cloudskillsboost.google/paths/183?locale=ja)
 
 ## Python環境構築
 
-* APIキー発行
-
 * プロジェクト作成
+  * APIキー発行（GCP）
+
   * [hatch](https://hatch.pypa.io/latest/install/)
     * 機能
       * backend build
@@ -82,3 +82,9 @@
       `TensorFlow has access to the following devices:`
       `[PhysicalDevice(name='/physical_device:CPU:0', device_type='CPU'), PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]`
       `TensorFlow version: 2.13.0`
+
+## Learning Path
+
+1. [Encoder-Decoder Architecture Learning](./docs/encoder-decoder-architecture-learning.md)
+
+1. [Transformer Models and BERT Model](./docs/transformer-models-and-bert-model.md)
