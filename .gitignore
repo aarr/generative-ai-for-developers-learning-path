@@ -1,4 +1,4 @@
 env/*
-src/training_checkpoints
-src/one_step
+*training_checkpoints
+*one_step
 **/__pycache__/**

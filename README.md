@@ -61,12 +61,21 @@
     * conda経由で[インストール](https://qiita.com/xtrizeShino/items/56e3c1e027107debe331)
       * condaで環境の作成、Activate
 
-      ```bash
-      # 作業ディレクトリを作成
-      $ conda create --prefix ./env python=3.8
-      # Python3.8ベースの仮想環境「env」を作成
-      $ conda activate ./env
-      ```
+        ```bash
+        # 作業ディレクトリを作成
+        $ conda create --prefix ./env python=3.8
+        # Python3.8ベースの仮想環境「env」を作成
+        $ conda activate ./env
+        ```
+
+      * tensorflow系パッケージをinsall
+
+        ```bash
+        conda install -c apple tensorflow-deps
+        python -m pip install tensorflow-macos
+        python -m pip install tensorflow-metal
+        conda install jupyter pandas numpy matplotlib scikit-learn
+        ```
 
     * GPUアクセス確認
 
