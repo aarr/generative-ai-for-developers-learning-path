@@ -1,6 +1,6 @@
-env/*
+env*
 *training_checkpoints
 *one_step
 **/__pycache__/**
 **_bert**
-model.png
+*.png

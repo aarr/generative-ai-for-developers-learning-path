@@ -37,6 +37,9 @@
   # [END aiplatform_create_user_managed_notebooks_instance_sample]
   ```
 
+  * GPU利用すると、GCP上でインスタンス立ち上げられず。
+    無料枠だと無理なのか。
+
 ## Local実行
 
 * Packageのinstall
@@ -59,7 +62,10 @@
     バージョンは`tensorflow-macos`のバージョンに合わせる
 
     ```bash
-    python -m pip install https://github.com/sun1638650145/Libraries-and-Extensions-for-TensorFlow-for-Apple-Silicon/releases/download/v2.13/tensorflow_text-2.13.0-cp38-cp38-macosx_11_0_arm64.whl
+    # 3.8系
+    # python -m pip install https://github.com/sun1638650145/Libraries-and-Extensions-for-TensorFlow-for-Apple-Silicon/releases/download/v2.13/tensorflow_text-2.13.0-cp38-cp38-macosx_11_0_arm64.whl
+    # 3.9系（cp39）
+    python -m pip install https://github.com/sun1638650145/Libraries-and-Extensions-for-TensorFlow-for-Apple-Silicon/releases/download/v2.18/tensorflow_text-2.18.0-cp39-cp39-macosx_11_0_arm64.whl
     ```
 
     * Tensorflow系パッケージバージョン確認
@@ -140,6 +146,12 @@
       export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
       ```
 
+    * pythonのバージョンを上げた際に、この設定が入っていることでデータダウンロードが出来なくなる。バージョンを上げる際には削除
+
+      ```bash
+      unset CRYPTOGRAPHY_OPENSSL_NO_LEGACY
+      ```
+
   * tf-models-officialをinstall
 
     ```bash
@@ -170,3 +182,8 @@
         a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA384
         v:NotBefore: Oct  8 00:00:00 2024 GMT; NotAfter: Oct  8 23:59:59 2025 GMT
       ```
+
+  * Tensorflowのバージョンを2.18まで上げると。。。
+    Tensorflow2.16からKeras3が利用される。
+    * [saved_modelをload_modelで読み込めなくなった](https://qiita.com/n_kats_/items/80725804ed7d3c61a691)
+    * 再度モデルから作成しなおし

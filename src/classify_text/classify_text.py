@@ -14,6 +14,9 @@ import ssl
 
 warnings.filterwarnings("ignore")
 os.environ[ "TF_CPP_MIN_LOG_LEVEL" ] = "2"
+# Tensorflow-hubはTensorflow2.16と互換性がない
+# https://github.com/tensorflow/hub/issues/903
+# os.environ['TF_USE_LEGACY_KERAS']='1'
 
 tf.get_logger().setLevel("ERROR")
 
@@ -30,17 +33,18 @@ def main():
     print("Num Gpus Available: ", len(tf.config.list_physical_devices("GPU")))
 
     # ファイルダウンロード
-    work_base_dir = os.path.join(os.path.expanduser("~"),
-                        "work",
-                        "generative-ai-for-developers-learning-path")
+    work_base_dir = get_work_dir()
+    print(f"work_base_dir : {work_base_dir}")
     download_dataset(work_base_dir)
+    train_dir = get_train_dir(work_base_dir)
+    print(f"train_dir : {train_dir}")
 
     AUROTUNE = tf.data.AUTOTUNE
     batch_size = 32
     seed = 42
 
     row_train_ds = tf.keras.preprocessing.text_dataset_from_directory(
-        get_train_dir(work_base_dir),
+        train_dir,
         batch_size=batch_size,
         validation_split=0.2,
         subset="training",
@@ -51,7 +55,7 @@ def main():
     train_ds = row_train_ds.cache().prefetch(buffer_size=AUROTUNE)
 
     val_ds = tf.keras.preprocessing.text_dataset_from_directory(
-        get_train_dir(work_base_dir),
+        train_dir,
         batch_size=batch_size,
         validation_split=0.2,
         subset="validation",
@@ -188,7 +192,6 @@ def main():
     print("Result from the model in memory : ")
     print_my_example(examples, original_result)
 
-
     print("END")
 
 
@@ -211,19 +214,38 @@ def download_dataset(work_base_dir):
     train_dir = get_train_dir(work_base_dir)
     remove_dir = os.path.join(train_dir, "unsup")
     # 対象ディレクトリを丸ごと削除
-    shutil.rmtree(remove_dir)
+    shutil.rmtree(remove_dir, ignore_errors=True)
+
+# ディレクトリ作成
+def make_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+# ワークディレクトリ取得
+def get_work_dir():
+    work_base_dir = os.path.join(os.path.expanduser("~"),
+                    "work",
+                    "generative-ai-for-developers-learning-path")
+    make_dir(work_base_dir)
+    return work_base_dir
 
 # データセットディレクトリ取得
 def get_dataset_dir(work_base_dir):
-    return os.path.join(work_base_dir, "aclImdb")
+    base_dir = os.path.join(work_base_dir, "aclImdb")
+    make_dir(base_dir)
+    return base_dir
 
 # トレーニングディレクトリ取得
 def get_train_dir(work_base_dir):
-    return os.path.join(get_dataset_dir(work_base_dir), "train")
+    train_dir = os.path.join(get_dataset_dir(work_base_dir), "train")
+    make_dir(train_dir)
+    return train_dir
 
 # テストディレクトリ取得
 def get_test_dir(work_base_dir):
-    return os.path.join(get_dataset_dir(work_base_dir), "test")
+    test_dir = os.path.join(get_dataset_dir(work_base_dir), "test")
+    make_dir(test_dir)
+    return test_dir
 
 # BuildModel
 def build_classifier_model(dropout_rate=0.1):
