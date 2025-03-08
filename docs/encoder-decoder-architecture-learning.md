@@ -16,6 +16,7 @@
   ```
 
   不要な環境は削除
+
   ```bash
   conda env remove --prefix env
   ```
